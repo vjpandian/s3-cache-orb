@@ -4,7 +4,7 @@ version: 2.1
 
 parameters:
   orb-file:
-    type: secret
+    type: string
     default: "s3-cache.yml"
   orb-name:
     type: string 
@@ -28,16 +28,16 @@ jobs:
           command: circleci info org
       - run: 
           name: Validate the Orb YAML Source Code
-          command: circleci orb validate << pipelines.parameters.orb-file >>
+          command: circleci orb validate << pipeline.parameters.orb-file >>
       - run: 
           name: Test by Publishing a Dev Version
-          command: circleci orb publish << pipelines.parameters.orb-file >> << pipelines.parameters.orb-name >>@dev:<< pipelines.git.revision >>
+          command: circleci orb publish << pipeline.parameters.orb-file >> << pipeline.parameters.orb-name >>@dev:<< pipeline.git.revision >>
       - run: 
           name: Promote the published Dev Version
-          command: circleci orb publish promote << pipelines.parameters.orb-name >>@dev:<< pipelines.git.revision >> patch
+          command: circleci orb publish promote << pipeline.parameters.orb-name >>@dev:<< pipeline.git.revision >> patch
  
 workflows:
-  workflow1:
+  orb-publish:
     jobs:
       - orb-publish-job:
            context: org-global
