@@ -1,2 +1,3 @@
 # s3-cache-orb
-Simple CircleCI Cache Implementation to an S3 bucket 
+
+A simple CircleCI Cache Implementation using an S3 bucket 
