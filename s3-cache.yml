@@ -16,7 +16,7 @@ commands:
                    echo "Cache already exists in path...no need to perform restore"
                    echo "Can perform unzip and then use cache here..."
                 else
-                      # Check if cache exists in S3
+                      echo "Cache does not exist locally..will check in S3"
                       if aws s3 ls "s3://vijay-custom-cache/<< parameters.cache-key >>" >/dev/null 2>&1; then
                          echo "Cache key found!...will restore cache now"
                          aws s3 sync "s3://vijay-custom-cache/<< parameters.cache-key >>" "./<< parameters.cache-key >>"
