@@ -12,15 +12,20 @@ commands:
       - run: 
           name: "Restore cache if a matching key is found in S3"
           command: |                 
-                # Check if the folder name exists in S3
-                if aws s3 ls "s3://vijay-custom-cache/<< parameters.cache-key >>" >/dev/null 2>&1; then
-                    echo "Cache key found!...will restore cache now"
-                    aws s3 sync "s3://vijay-custom-cache/<< parameters.cache-key >>" "./<< parameters.cache-key >>"
-                    echo "Sync completed!"
+                if test -e "<< parameters.cache-key >>.zip"; then
+                   echo "Cache already exists in path...no need to perform restore"
+                   echo "Can perform unzip and then use cache here..."
                 else
-                    echo "Key not found in S3: << parameters.cache-key >>"
+                      # Check if cache exists in S3
+                      if aws s3 ls "s3://vijay-custom-cache/<< parameters.cache-key >>" >/dev/null 2>&1; then
+                         echo "Cache key found!...will restore cache now"
+                         aws s3 sync "s3://vijay-custom-cache/<< parameters.cache-key >>" "./<< parameters.cache-key >>"
+                         echo "Sync completed!"
+                      else
+                         echo "Key not found in S3: << parameters.cache-key >>"
+                      fi
+                   echo "File does not exist"
                 fi
-
   save-cache:
     description: Custom cache store to S3
     parameters:
