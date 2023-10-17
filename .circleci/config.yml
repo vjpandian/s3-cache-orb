@@ -20,6 +20,9 @@ jobs:
     executor: cli/default
     steps:
       - checkout
+      - run:
+          name: install jq
+          command: curl -L -o /usr/bin/jq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64
       - cli/install
       - cli/setup:
             token: CIRCLE_TOKEN
