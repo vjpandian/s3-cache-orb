@@ -36,7 +36,7 @@ commands:
     steps:
       - run:
           name: "Save cache to s3 bucket"
-          command: aws s3 cp << parameters.cache-path >> s3://vijay-custom-cache/<< parameters.cache-key >>/<< parameters.cache-path >>
+          command: aws s3 cp << parameters.cache-path >> s3://custeng-custom-cache-test/<< parameters.cache-key >>/<< parameters.cache-path >>
 
 jobs:
   s3-cache:
