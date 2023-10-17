@@ -40,22 +40,30 @@ jobs:
               --header "content-type: application/json" \
               --data '{"branch":"orb-dev-version-test"}'
       - run: 
-          name: Check if the triggered test deployment was successful
+          name:
           command: |
-             # Make a request to the CircleCI API to get the latest pipeline for the specified branch
-             pipeline_status=$(curl -s -u "${CIRCLECI_TOKEN}:" "https://circleci.com/api/v2/project/github/vjpandian/mac-runner-cache-test/pipeline?branch=orb-dev-version-test" | jq -r '.items[0].state')
-             sleep 5
-             # Check the pipeline status and act accordingly
-             if [ "$pipeline_status" = "success" ]; then
-               echo "Pipeline is successful"
-               exit 0
-             elif [ "$pipeline_status" = "failed" ]; then
-               echo "Pipeline has failed"
-               exit 1
-             else
-               echo "Pipeline is in an unknown state: $pipeline_status"
-               exit 2
-             fi
+             # Make an initial request to the CircleCI API to retrieve the pipeline information for the specified branch.
+             pip=$(curl -s -H "Circle-Token: ${CIRCLECI_TOKEN}" "https://circleci.com/api/v2/project/gh/vjpandian/mac-runner-cache-test/pipeline?branch=orb-dev-version-test")
+             
+             # Extract the pipeline IDs and their corresponding commit revisions
+             pipeline_ids=$(echo $pip | jq -r '.items[] | {"id": .id, "revision": .vcs.revision}' )
+             
+             echo ${pipeline_ids} | jq -c '.' | while read pip; do
+              pip_id=$(echo $pip | jq -r '.id')
+              pip_sha=$(echo $pip | jq -r '.revision')
+              workflow=$(curl -H "Circle-Token: ${CIRCLECI_TOKEN}" https://circleci.com/api/v2/pipeline/$pip_id/workflow)
+             
+              # Check if any workflow item has a status of "success" 
+              result=$(echo $workflow | jq -r '.items[] | select(.status == "success")')
+             
+              # If a successful status is found, print the commit SHA and exit the loop. Otherwise, indicate that a successful status was not found.
+              if [[ -n "$result" ]]; then
+                echo "Successful status found. commit sha: $pip_sha"
+                break
+              else
+                echo "Successful status not found."
+              fi
+             done
 
       - run: 
           name: Promote the published Dev Version
