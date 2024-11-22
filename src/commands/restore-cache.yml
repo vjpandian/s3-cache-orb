@@ -10,10 +10,6 @@ parameters:
     type: string
     description: "By default, the branch name will be the cache key"
     default: << pipeline.git.branch >>
-  cache-path:
-    type: string
-    description: "Path to extract the cache locally"
-    default: /tmp
   s3-max-concurrent-requests:
     type: integer
     description: "Maximum number of concurrent S3 requests"
@@ -30,7 +26,6 @@ parameters:
 steps:
   - run:
       environment:
-        CACHE_PATH: << parameters.cache-path >>
         BUCKET_NAME: << parameters.bucket-name >>
         CACHE_KEY: << parameters.cache-key >>
         MAX_QUEUE_SIZE: << parameters.s3-max-queue-size >>
