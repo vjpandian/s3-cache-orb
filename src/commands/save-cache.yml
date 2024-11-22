@@ -8,7 +8,7 @@ parameters:
     description: "Bucket name for storing caches"
   cache-key:
     type: string
-    description: "By default, the orb will simply use the branch name for the cache key"
+    description: "By default, the branch name will be the cache key"
     default: << pipeline.git.branch >>
   cache-path:
     type: string
