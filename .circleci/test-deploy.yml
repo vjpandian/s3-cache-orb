@@ -1,7 +1,7 @@
 version: 2.1
 orbs:
   s3-cache: vjpandian/s3-cache@dev:<<pipeline.git.revision>>
-
+  orb-tools: circleci/orb-tools@12.0
 filters: &filters
   tags:
     only: /.*/
