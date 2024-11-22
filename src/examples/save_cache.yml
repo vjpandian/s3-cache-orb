@@ -23,6 +23,10 @@ usage:
             cache-path: << parameters.cache-path >>
             cache-key: << parameters.cache-key >>
             bucket-name: << parameters.bucket-name >>
+        - restore-cache:
+            cache-key: << parameters.cache-key >>
+            bucket-name: << parameters.bucket-name >>
+
   workflows:
     use-my-orb:
       jobs:

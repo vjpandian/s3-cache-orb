@@ -8,7 +8,12 @@ if [ -d "$CACHE_PATH" ]; then
   echo "Cache path exists. Archiving..."
   # Create the archive
   tar -czf "$CACHE_KEY.tar.gz" "$CACHE_PATH"
-  echo "Archive created: $CACHE_PATH.tar.gz"
+  if [ -f "$CACHE_KEY.tar.gz" ]; then
+      echo "Archive created: $CACHE_KEY.tar.gz"
+  else
+      echo "Failed to create archive: $CACHE_KEY.tar.gz"
+      exit 1
+  fi
 
   # Configure S3 settings
   aws configure set default.s3.max_concurrent_requests "$MAX_CONCURRENT_REQUESTS"
