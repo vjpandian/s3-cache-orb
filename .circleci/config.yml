@@ -1,49 +1,57 @@
-# Use the latest 2.1 version of CircleCI pipeline process engine.
-# See: https://circleci.com/docs/2.0/configuration-reference
 version: 2.1
-
-parameters:
-  orb-file:
-    type: string
-    default: "s3-cache.yml"
-  orb-name:
-    type: string 
-    default: "vjpandian/s3-cache"
-
+setup: true
 orbs:
+  orb-tools: circleci/orb-tools@11.5
+  shellcheck: circleci/shellcheck@3.1
   cli: circleci/circleci-cli@0.1.9
-  
-jobs:
-  orb-publish-job:
-    executor: cli/default
-    steps:
-      - checkout
-      - cli/install
-      - cli/setup:
-            token: CIRCLE_TOKEN
-      - run: 
-          name: Fetch org information
-          command: circleci info org
-      - run: 
-          name: Validate the Orb YAML Source Code
-          command: circleci orb validate << pipeline.parameters.orb-file >>
-      - run: 
-          name: Test by Publishing a Dev Version
-          command: circleci orb publish << pipeline.parameters.orb-file >> << pipeline.parameters.orb-name >>@dev:<< pipeline.git.revision >>
-      - run:
-          name: Trigger a test deployment with the dev version
-          command: |
-              curl -X POST https://circleci.com/api/v2/project/github/vjpandian/mac-runner-cache-test/pipeline \
-              --header "Circle-Token: $CIRCLE_TOKEN" \
-              --header "content-type: application/json" \
-              --data '{"branch":"orb-dev-version-test"}'
 
-      - run: 
-          name: Promote the published Dev Version
-          command: circleci orb publish promote << pipeline.parameters.orb-name >>@dev:<< pipeline.git.revision >> patch
- 
+filters: &filters
+  tags:
+    only: /.*/
+
+jobs:
+  create-orb:
+    docker:
+      - image: circleci/circleci-cli:latest
+    steps:
+      - cli/install
+      - run: echo "the CLI is now installed"
+      - cli/setup:
+          token: CIRCLE_TOKEN
+      - run: circleci info org
+      - run: circleci orb create $CIRCLE_USERNAME/continuation --no-prompt
+
+
 workflows:
-  orb-publish:
+  lint-pack:
     jobs:
-      - orb-publish-job:
-           context: org-global
+      #- create-orb:
+      #    context: org-global
+      - orb-tools/lint:
+          filters: *filters
+      - orb-tools/pack:
+          filters: *filters
+      - orb-tools/review:
+          filters: *filters
+      - shellcheck/check:
+          shell: bash
+          filters: *filters
+      - orb-tools/publish:
+          orb-name: vjpandian/s3-cache
+          vcs-type: << pipeline.project.type >>
+          requires:
+            - orb-tools/lint
+            - orb-tools/review
+            - orb-tools/pack
+            - shellcheck/check
+      
+          # Use a context to hold your publishing token.
+          context: org-global
+          filters: *filters
+      # Triggers the next workflow in the Orb Development Kit.
+      - orb-tools/continue:
+          pipeline-number: << pipeline.number >>
+          vcs-type: << pipeline.project.type >>
+          requires: 
+            - orb-tools/publish
+          filters: *filters

@@ -1,0 +1,48 @@
+description: >
+  Copy Contents of a Path to a custom S3 bucket
+
+parameters:
+  bucket-name:
+    type: string
+    description: "Bucket name for storing caches"
+  cache-key:
+    type: string
+    description: "By default, the orb will simply use the branch name for the cache key"
+    default: << pipeline.git.branch >>
+  cache-path:
+    type: string
+    description: "Path to be cached in S3"
+  s3-max-concurrent-requests:
+    type: integer
+    description: "Maximum number of concurrent S3 requests"
+    default: 20
+  s3-max-queue-size:
+    type: integer
+    description: "Maximum S3 queue size"
+    default: 10000
+  s3-multipart-threshold:
+    type: string
+    description: "S3 multipart upload threshold size"
+    default: "64MB"
+
+steps:
+  - run:
+      name: Save cache to S3 bucket
+      command: >-
+        # Check if the cache path exists
+        if [ -d "<< parameters.cache-path >>" ]; then
+          echo "Cache path exists. Archiving..."
+          tar -czf << parameters.cache-path >>.tar.gz -C "<< parameters.cache-path >>" .
+          echo "Archive created: << parameters.cache-path >>.tar.gz"
+
+          # Configure S3 settings
+          aws configure set default.s3.max_concurrent_requests << parameters.s3-max-concurrent-requests >>
+          aws configure set default.s3.max_queue_size << parameters.s3-max-queue-size >>
+          aws configure set default.s3.multipart_threshold << parameters.s3-multipart-threshold >>
+
+          # Upload the archive to the S3 bucket
+          aws s3 sync << parameters.cache-path >>.tar.gz s3://<< parameters.bucket-name >>/<< parameters.cache-key >>/<< parameters.cache-path >>.tar.gz
+          echo "Cache archive uploaded to S3."
+        else
+          echo "Cache path does not exist. Skipping upload."
+        fi
