@@ -2,10 +2,18 @@ version: 2.1
 orbs:
   s3-cache: vjpandian/s3-cache@dev:<<pipeline.git.revision>>
   orb-tools: circleci/orb-tools@12.2.0
+# Use this tag to ensure test jobs always run,
+# even though the downstream publish job will only run on release tags.
 filters: &filters
   tags:
     only: /.*/
 
+# Filter for release tags.
+release-filters: &release-filters
+  branches:
+    ignore: /.*/
+  tags:
+    only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
 jobs:
   # You may want to add additional validation steps to ensure the commands are working as expected.
   command-tests:
@@ -22,22 +30,19 @@ workflows:
   test-deploy:
     jobs:
       # Make sure to include "filters: *filters" in every test job you want to run as part of your deployment.
+      # Test your orb's commands in a custom job and test your orb's jobs directly as a part of this workflow.
       - command-tests:
           filters: *filters
+      # The orb must be re-packed for publishing, and saved to the workspace.
       - orb-tools/pack:
-          filters: *filters
+          filters: *release-filters
       - orb-tools/publish:
-          orb-name: vjpandian/s3-cache
-          vcs-type: << pipeline.project.type >>
-          pub-type: production
+          orb_name: vjpandian/s3-cache
+          vcs_type: << pipeline.project.type >>
+          pub_type: production
+          # Ensure this job requires all test jobs and the pack job.
           requires:
             - orb-tools/pack
-            - command-tests
-          context: org-global
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
-
-# VS Code Extension Version: 1.4.0
+            - command-test
+          context: <publishing-context>
+          filters: *release-filters
