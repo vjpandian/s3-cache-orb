@@ -1,3 +1,4 @@
+---
 description: >
   Copy Contents of a Path to a custom S3 bucket
 
@@ -31,8 +32,4 @@ steps:
         CACHE_PATH: << parameters.cache-path >>
         BUCKET_NAME: << parameters.bucket-name >>
         CACHE_KEY: << parameters.cache-key >>
-        MAX_QUEUE_SIZE: << parameters.s3-max-queue-size >>
-        S3_MULTIPART_THRESHOLD: << parameters.s3-multipart-threshold >>
-        MAX_CONCURRENT_REQUESTS: << parameters.s3-max-concurrent-requests >>
-      name: Save cache to S3 bucket
-      command: <<include(scripts/save-cache.sh)>>
+        MAX_QUEUE_SIZE: << parameters.s3-max-queu

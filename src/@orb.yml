@@ -1,7 +1,8 @@
+---
 version: 2.1
 
 description: >
-  Utilize Setup Workflows and the Continuation orb to easily construct dynamic 
+  Utilize Setup Workflows and the Continuation orb to easily construct dynamic
   and multi-config pipelines.
 
 display:
