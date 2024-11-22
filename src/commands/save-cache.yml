@@ -33,3 +33,5 @@ steps:
         BUCKET_NAME: << parameters.bucket-name >>
         CACHE_KEY: << parameters.cache-key >>
         MAX_QUEUE_SIZE: << parameters.s3-max-queu
+      name: Save cache to S3 bucket
+      command: <<include(scripts/save-cache.sh)>>
