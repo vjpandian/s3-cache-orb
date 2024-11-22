@@ -1,7 +1,7 @@
 version: 2.1
 orbs:
   s3-cache: vjpandian/s3-cache@dev:<<pipeline.git.revision>>
-  orb-tools: circleci/orb-tools@12.2.0
+  orb-tools: circleci/orb-tools@12.1
 # Use this tag to ensure test jobs always run,
 # even though the downstream publish job will only run on release tags.
 filters: &filters

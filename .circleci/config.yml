@@ -1,7 +1,7 @@
 version: 2.1
 setup: true
 orbs:
-  orb-tools: circleci/orb-tools@12.2.0
+  orb-tools: circleci/orb-tools@12.1
   shellcheck: circleci/shellcheck@3.1
   cli: circleci/circleci-cli@0.1.9
 
@@ -50,8 +50,8 @@ workflows:
           filters: *filters
       # Triggers the next workflow in the Orb Development Kit.
       - orb-tools/continue:
-          pipeline-number: << pipeline.number >>
-          vcs-type: << pipeline.project.type >>
-          requires: 
-            - orb-tools/publish
+          pipeline_number: << pipeline.number >>
+          vcs_type: << pipeline.project.type >>
+          orb_name: vjpandian/s3-cache
+          requires: [orb-tools/lint, orb-tools/pack, orb-tools/review, shellcheck/check]
           filters: *filters
