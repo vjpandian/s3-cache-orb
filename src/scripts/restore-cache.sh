@@ -29,19 +29,12 @@ if aws s3 ls "s3://$BUCKET_NAME/$CACHE_KEY/$CACHE_KEY.tar.gz" > /dev/null 2>&1; 
     if aws s3 cp "s3://$BUCKET_NAME/$CACHE_KEY/$CACHE_KEY.tar.gz" "$CACHE_KEY.tar.gz"; then
         echo "Cache archive downloaded: $CACHE_KEY.tar.gz"
 
-        # Extract the archive to the specified cache path
-        echo "Extracting archive to $CACHE_PATH..."
-        mkdir -p "$CACHE_PATH"
-        if tar -xzf "$CACHE_KEY.tar.gz" -C "$CACHE_PATH"; then
-            echo "Cache restored to $CACHE_PATH."
+        if tar -xzf "$CACHE_KEY.tar.gz" .; then
+            echo "Cache restored...."
         else
             echo "Failed to extract cache archive."
             exit 1
         fi
-
-        # Cleanup the local archive file
-        rm -f "$CACHE_KEY.tar.gz"
-        echo "Local archive removed."
     else
         echo "Failed to download cache archive."
         exit 1
