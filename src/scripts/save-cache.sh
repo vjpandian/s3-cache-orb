@@ -16,7 +16,7 @@ if [ -d "$CACHE_PATH" ]; then
   aws configure set default.s3.multipart_threshold "$S3_MULTIPART_THRESHOLD"
 
   # Upload the archive to the S3 bucket
-  aws s3 cp "$CACHE_KEY.tar.gz" "s3://<<parameters.bucket-name>>/$CACHE_KEY/$CACHE_KEY.tar.gz"
+  aws s3 cp "$CACHE_KEY.tar.gz" "s3://$BUCKET_NAME/$CACHE_KEY/$CACHE_KEY.tar.gz"
   echo "Cache archive uploaded to S3."
 else
   echo "Cache path does not exist. Skipping upload."
