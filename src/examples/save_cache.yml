@@ -19,9 +19,9 @@ usage:
         - image: cimg/base:stable
       steps:
         - save-cache:
-               cache-path: << parameters.cache-path >>
-               cache-key: << parameters.cache-key >>
-               bucket-name: << parameters.bucket-name >>
+            cache-path: << parameters.cache-path >>
+            cache-key: << parameters.cache-key >>
+            bucket-name: << parameters.bucket-name >>
   workflows:
     use-my-orb:
       jobs:
