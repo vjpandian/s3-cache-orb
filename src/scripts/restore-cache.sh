@@ -10,7 +10,7 @@ if [ -z "$CACHE_KEY" ] || [ -z "$CACHE_PATH" ]; then
 fi
 
 # Check if the cache path already exists locally
-if [ -d "$CACHE_PATH" ]; then
+if [ -d "$CACHE_PATH/$CACHE_KEY" ]; then
     echo "Cache already exists locally at $CACHE_PATH. Skipping download."
     exit 0
 fi
