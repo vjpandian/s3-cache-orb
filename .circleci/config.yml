@@ -1,25 +1,13 @@
 version: 2.1
 setup: true
 orbs:
-  orb-tools: circleci/orb-tools@12.1
+  orb-tools: circleci/orb-tools@11.5
   shellcheck: circleci/shellcheck@3.1
   cli: circleci/circleci-cli@0.1.9
 
 filters: &filters
   tags:
     only: /.*/
-
-jobs:
-  create-orb:
-    docker:
-      - image: circleci/circleci-cli:latest
-    steps:
-      - cli/install
-      - run: echo "the CLI is now installed"
-      - cli/setup:
-          token: CIRCLE_TOKEN
-      - run: circleci info org
-      - run: circleci orb create $CIRCLE_USERNAME/continuation --no-prompt
 
 
 workflows:
@@ -37,7 +25,7 @@ workflows:
           shell: bash
           filters: *filters
       - orb-tools/publish:
-          orb-name: vjpandian/s3-cache
+          orb-name: vjpandian/continuation
           vcs-type: << pipeline.project.type >>
           requires:
             - orb-tools/lint
@@ -50,8 +38,8 @@ workflows:
           filters: *filters
       # Triggers the next workflow in the Orb Development Kit.
       - orb-tools/continue:
-          pipeline_number: << pipeline.number >>
-          vcs_type: << pipeline.project.type >>
-          orb_name: vjpandian/s3-cache
-          requires: [orb-tools/lint, orb-tools/pack, orb-tools/review, shellcheck/check]
+          pipeline-number: << pipeline.number >>
+          vcs-type: << pipeline.project.type >>
+          requires: 
+            - orb-tools/publish
           filters: *filters
