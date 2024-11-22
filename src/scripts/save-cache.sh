@@ -1,7 +1,10 @@
 #!/bin/bash
 
+echo "Cache Path is <<<parameters.cache-path>>"
+
 # Check if the cache path exists
 if [ -d "<<parameters.cache-path>>" ]; then
+  
   echo "Cache path exists. Archiving..."
   # Create the archive
   tar -czf "<<parameters.cache-key>>.tar.gz" "<<parameters.cache-path>>"
