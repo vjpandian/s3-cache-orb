@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "Cache Path is <<<parameters.cache-path>>"
+echo "Cache Path is <<parameters.cache-path>>"
 
 # Check if the cache path exists
 if [ -d "<<parameters.cache-path>>" ]; then
